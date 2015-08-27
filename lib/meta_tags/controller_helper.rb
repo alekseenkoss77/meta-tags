@@ -14,6 +14,7 @@ module MetaTags
 
     included do
       alias_method_chain :render, :meta_tags
+      before_filter :render_meta_tags_from_locale
     end
 
     # Processes the <tt>@page_title</tt>, <tt>@page_keywords</tt>, and
@@ -40,5 +41,13 @@ module MetaTags
       @meta_tags ||= MetaTagsCollection.new
     end
     protected :meta_tags
+
+    def render_meta_tags_from_locale
+      name_space = "meta_tags.#{controller_name}.#{action_name}"
+      self.meta_tags[:title]       = I18n.t("#{name_space}.title") unless I18n.t("#{name_space}.title", default: "").blank?
+      self.meta_tags[:keywords]    = I18n.t("#{name_space}.keywords") unless I18n.t("#{name_space}.keywords", default: "").blank?
+      self.meta_tags[:description] = I18n.t("#{name_space}.description") unless I18n.t("#{name_space}.description", default: "").blank?
+    end
+    protected :render_meta_tags_from_locale
   end
 end
